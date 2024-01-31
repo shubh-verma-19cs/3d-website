@@ -1,27 +1,55 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'; 
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'; 
+// import { GlitchPass } from 'three/addons/postprocessing/GlitchPass.js';
+// import { FXAAShader } from 'three/addons/shaders/FXAAShader.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+// import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera( 80, window.innerWidth / window.innerHeight, 0.1, 1000 );
 const renderer = new THREE.WebGLRenderer();
+const resolution = new THREE.Vector2(window.innerWidth, window.innerHeight);
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
+
+const composer = new EffectComposer( renderer );
+const renderPass = new RenderPass( scene, camera ); 
+composer.addPass( renderPass );
+
+// Bloom
+// const unrealBloomPass = new UnrealBloomPass(resolution, 0.3, 1);
+// composer.addPass( unrealBloomPass );
+const outputPass = new OutputPass();
+composer.addPass( outputPass );
 /////
-const geometry = new THREE.SphereGeometry(2, 12, 8)
+const geometry = new THREE.IcosahedronGeometry(2, 2);
 const material = new THREE.MeshPhongMaterial( {
     color: 0xffffff, 
-    // flatShading: true,
+    flatShading: true,
     transparent: true,
     opacity: 1,
-    wireframe: true,
+    // wireframe: true,
     // wireframeLinewidth: 10,
 } );
 
 // Make a sphere
 const sphere = new THREE.Mesh( geometry, material );
+const wireframeMaterial = new THREE.MeshBasicMaterial( { 
+    color: 0x000000,
+    wireframe: true,
+    wireframeLinewidth: 5.0,
+    transparent: true 
+} );
+let wireframe = new THREE.Mesh(geometry, wireframeMaterial);
+sphere.add( wireframe );
 sphere.position.set(0, 0, 0)
 sphere.rotation.set(0, 0, 0)
 scene.add( sphere );
+
 
 //Controls
 const controls = new OrbitControls( camera, renderer.domElement );
@@ -48,6 +76,8 @@ let frames = 0, prevTime = performance.now();
 
 camera.position.set(3, 3, 3)
 camera.lookAt(new THREE.Vector3(0, 0, 0))
+
+
 function animate() {
 	requestAnimationFrame( animate );
     // sphere.rotation.x += 0.01;
@@ -67,7 +97,8 @@ function animate() {
       
     }
 	
-    renderer.render( scene, camera );
+    composer.render();
+    // renderer.render( scene, camera );
 }
 
 
