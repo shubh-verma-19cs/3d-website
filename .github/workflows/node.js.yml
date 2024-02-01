@@ -28,5 +28,5 @@ jobs:
         cache: 'npm'
     - run: npm i
     - run: npm i --save three
-    - run: npx run
+    - run: npm run
     - run: npm test
