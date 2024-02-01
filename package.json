@@ -5,11 +5,13 @@
   "main": "main.js",
   "scripts": {
     "test": "npm test",
-    "run": "npx serve ."
+    "run": "npx serve .",
+    "deploy": "gh-pages -d dist"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "gh-pages": "^6.1.1",
     "three": "^0.160.1"
   }
 }
